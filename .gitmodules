@@ -1,0 +1,12 @@
+[submodule "Optometrist/android-ar"]
+	path = Optometrist/android-ar
+	url = git@github.com:matt-williams/android-ar.git
+[submodule "Optometrist/android-gl"]
+	path = Optometrist/android-gl
+	url = git@github.com:matt-williams/android-gl.git
+[submodule "android-gl"]
+	path = android-gl
+	url = git@github.com:matt-williams/android-gl.git
+[submodule "android-ar"]
+	path = android-ar
+	url = git@github.com:matt-williams/android-ar.git
