@@ -2,6 +2,7 @@ package com.github.matt.williams.optometrist;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.InputDevice.MotionRange;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -43,12 +44,16 @@ public class CalibrationView extends CameraView {
         mListener = listener;
     }
 
+    public void setMatrix(float[] matrix) {
+        mProjection.setTransformationMatrix(matrix);
+    }
+
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-        // MotionRange motionRangeX = event.getDevice().getMotionRange(MotionEvent.AXIS_X);
-        // MotionRange motionRangeY = event.getDevice().getMotionRange(MotionEvent.AXIS_Y);
-        // float rangeX = (motionRangeX.getMax() - motionRangeX.getMin());
-        // float rangeY = (motionRangeY.getMax() - motionRangeY.getMin());
+        MotionRange motionRangeX = event.getDevice().getMotionRange(MotionEvent.AXIS_X);
+        MotionRange motionRangeY = event.getDevice().getMotionRange(MotionEvent.AXIS_Y);
+        float rangeX = (motionRangeX.getMax() - motionRangeX.getMin());
+        float rangeY = (motionRangeY.getMax() - motionRangeY.getMin());
         float minX = Float.MAX_VALUE;
         float minY = Float.MAX_VALUE;
         float maxX = Float.MIN_VALUE;
@@ -70,15 +75,14 @@ public class CalibrationView extends CameraView {
                 ((newX - mPreviousX) * (newX - mPreviousX) + (newY - mPreviousY) * (newY - mPreviousY) > 25.0f)) {
                 mMoved = true;
             }
-            mProjection.setTranslation(mProjection.mTranslateX + 0.00025f * mProjection.mScaleX * (newX - mPreviousX),
-                                      mProjection.mTranslateY - 0.00025f * mProjection.mScaleY * (newY - mPreviousY));
             if (event.getPointerCount() > 1) {
-                mProjection.setScale(mProjection.mScaleX * (newScale / mPreviousScale), mProjection.mScaleY * (newScale / mPreviousScale));
+                mProjection.scale(newScale / mPreviousScale, newScale / mPreviousScale);
             }
+            mProjection.translate((newX - mPreviousX) / rangeX, (newY - mPreviousY) / rangeY);
         } else if ((event.getAction() == MotionEvent.ACTION_UP) &&
                    (!mMoved) &&
                    (event.getEventTime() - event.getDownTime() < 400)) {
-            mListener.onCalibrationComplete(mProjection.getViewMatrix());
+            mListener.onCalibrationComplete(mProjection.getTransformationMatrix());
         }
         mPreviousX = newX;
         mPreviousY = newY;

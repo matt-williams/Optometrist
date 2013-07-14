@@ -23,12 +23,20 @@ public class Preferences {
         for (int ii = 0; ii < matrix.length; ii++) {
             editor.putFloat(PROPERTY_MATRIX + "[" + ii + "]", matrix[ii]);
         }
-        editor.apply();
+        editor.commit();
+    }
+
+    public boolean hasMatrix() {
+        boolean hasMatrix = true;
+        for (int ii = 0; ii < DEFAULT_MATRIX.length; ii++) {
+            hasMatrix &= mPreferences.contains(PROPERTY_MATRIX + "[" + ii + "]");
+        }
+        return hasMatrix;
     }
 
     public float[] getMatrix() {
-        float[] matrix = new float[16];
-        for (int ii = 0; ii < matrix.length; ii++) {
+        float[] matrix = new float[DEFAULT_MATRIX.length];
+        for (int ii = 0; ii < DEFAULT_MATRIX.length; ii++) {
             matrix[ii] = mPreferences.getFloat(PROPERTY_MATRIX + "[" + ii + "]", DEFAULT_MATRIX[ii]);
         }
         return matrix;

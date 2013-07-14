@@ -7,31 +7,37 @@ import android.view.WindowManager;
 
 public class CalibrationActivity extends Activity implements CalibrationView.OnCalibrationCompleteListener {
 
+    private Preferences mPreferences;
     private CalibrationView mCameraView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mPreferences = new Preferences(this);
         Intent intent = getIntent();
-        String action = intent.getAction();
-        if ((action != null) &&
-            (action.equals(Intents.ACTION_CALIBRATE))) {
-
+        if (Intents.isActionCalibrate(intent) &&
+            Intents.isExtraForce(intent) &&
+            mPreferences.hasMatrix()) {
+            onCalibrationComplete(mPreferences.getMatrix());
+        } else {
+            setContentView(R.layout.activity_calibration);
+            mCameraView = (CalibrationView)findViewById(R.id.calibrationView);
+            mCameraView.setMatrix(mPreferences.getMatrix());
+            mCameraView.requestFocus();
+            mCameraView.setOnCalibrationCompleteListener(this);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
-
-
-        setContentView(R.layout.activity_calibration);
-        mCameraView = (CalibrationView)findViewById(R.id.calibrationView);
-        mCameraView.requestFocus();
-        mCameraView.setOnCalibrationCompleteListener(this);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        // TODO Auto-generated method stub
-        super.onNewIntent(intent);
+        if (Intents.isActionCalibrate(intent) &&
+            Intents.isExtraForce(intent) &&
+            mPreferences.hasMatrix()) {
+            onCalibrationComplete(mPreferences.getMatrix());
+        } else {
+            super.onNewIntent(intent);
+        }
     }
 
     @Override
@@ -48,8 +54,9 @@ public class CalibrationActivity extends Activity implements CalibrationView.OnC
 
     @Override
     public void onCalibrationComplete(float[] matrix) {
+        mPreferences.setMatrix(matrix);
         Intent intent = new Intent();
-        intent.putExtra(Intents.EXTRA_MATRIX, matrix);
+        Intents.setExtraMatrix(intent, matrix);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

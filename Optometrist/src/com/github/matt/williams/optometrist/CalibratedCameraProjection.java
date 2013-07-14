@@ -5,11 +5,13 @@ import android.opengl.Matrix;
 import com.github.matt.williams.android.gl.Projection;
 
 public class CalibratedCameraProjection extends Projection {
-    public float[] mProjectionMatrix = new float[16];
-    public float mScaleX = 1.0f;
-    public float mScaleY = 1.0f;
-    public float mTranslateX = 0.0f;
-    public float mTranslateY = 0.0f;
+    private float[] mProjectionMatrix = new float[16];
+    private float[] mTransformationMatrix = new float[16];
+
+    public CalibratedCameraProjection() {
+        Matrix.setIdentityM(mProjectionMatrix, 0);
+        Matrix.setIdentityM(mTransformationMatrix, 0);
+    }
 
     @Override
     public void setProjectionMatrix(float[] projectionMatrix) {
@@ -17,23 +19,28 @@ public class CalibratedCameraProjection extends Projection {
         updateProjectionMatrix();
     }
 
-    public void setScale(float scaleX, float scaleY) {
-        mScaleX = scaleX;
-        mScaleY = scaleY;
+    public float[] getTransformationMatrix() {
+        return mTransformationMatrix;
+    }
+
+    public void setTransformationMatrix(float[] transformationMatrix) {
+        mTransformationMatrix = transformationMatrix;
         updateProjectionMatrix();
     }
 
-    public void setTranslation(float translateX, float translateY) {
-        mTranslateX = translateX;
-        mTranslateY = translateY;
+    public void scale(float scaleX, float scaleY) {
+        Matrix.scaleM(mTransformationMatrix, 0, scaleX, scaleY, 1.0f);
+        updateProjectionMatrix();
+    }
+
+    public void translate(float translateX, float translateY) {
+        Matrix.translateM(mTransformationMatrix, 0, translateX, translateY, 0);
         updateProjectionMatrix();
     }
 
     private void updateProjectionMatrix() {
         float[] temp = new float[16];
-        System.arraycopy(mProjectionMatrix, 0, temp, 0, 16);
-        Matrix.translateM(temp, 0, -mTranslateY, -mTranslateX, 0.0f);
-        Matrix.scaleM(temp, 0, mScaleY, mScaleX, 1.0f);
+        Matrix.multiplyMM(temp, 0, mTransformationMatrix, 0, mProjectionMatrix, 0);
         super.setProjectionMatrix(temp);
     }
 }
