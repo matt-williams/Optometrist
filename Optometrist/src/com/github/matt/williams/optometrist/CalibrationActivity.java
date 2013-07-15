@@ -16,7 +16,7 @@ public class CalibrationActivity extends Activity implements CalibrationView.OnC
         mPreferences = new Preferences(this);
         Intent intent = getIntent();
         if (Intents.isActionCalibrate(intent) &&
-            Intents.isExtraForce(intent) &&
+            !Intents.isExtraForce(intent) &&
             mPreferences.hasMatrix()) {
             onCalibrationComplete(mPreferences.getMatrix());
         } else {

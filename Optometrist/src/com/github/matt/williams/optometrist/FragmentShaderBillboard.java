@@ -12,7 +12,7 @@ import com.github.matt.williams.android.gl.VertexShader;
 
 public class FragmentShaderBillboard extends CameraBillboard {
     public FragmentShaderBillboard(Resources resources, Texture texture, int fragmentShaderId) {
-        super(new Program(new VertexShader(resources.getString(com.github.matt.williams.android.ar.R.string.cameraBillboardVertexShader)),
+        super(new Program(new VertexShader(resources.getString(R.string.cameraBillboardVertexShader)),
                           new FragmentShader(resources.getString(fragmentShaderId))),
               texture);
     }
